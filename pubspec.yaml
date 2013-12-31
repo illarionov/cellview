@@ -1,0 +1,7 @@
+name: cellview
+description: GSM coverage map that is based on the data collected using the MozStumbler. http://moz.0xdc.ru/
+dependencies:
+  browser: any
+  angular: any
+  json_object: any
+  logging: any

@@ -1,0 +1,10 @@
+/packages/*
+web/packages
+web/out/*
+.buildlog
+/build
+/out
+*.dart.js
+*.dart.js.deps
+*.dart.js.map
+*.dart.precompiled.js

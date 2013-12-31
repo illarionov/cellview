@@ -1,0 +1,70 @@
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0 
+}
+
+#map-canvas { 
+  height: 100% 
+}
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+.legend {
+    line-height: 18px;
+    color: #555;
+}
+.legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+.info.cells_form {
+    clear: right;
+    margin-left: 40px;
+}
+
+.info.cells_form fieldset {
+   border: none;
+   padding: 0px;
+   margin-left: 15px;
+   margin-right: 15px;
+}
+
+.info.cells_form ul {
+   padding-left: 0px;
+}
+
+.info.cells_form li {
+   display: inline;
+   margin-left: 1.2em;
+}
+
+.info.cells_form li:first-child {
+   margin-left: 0;
+}
+
+.info.cells_form select {
+   min-width: 5em;
+}
+

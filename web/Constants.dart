@@ -3,7 +3,8 @@ library constants;
 import 'cellform/CellFormData.dart';
 
 final String MAPBOX_API_KEY = "lsillarionov.ghk4pdd0";
-final API_URL = "http://moz.0xdc.ru";
+// final API_URL = "http://moz.0xdc.ru";
+final API_URL = "http://127.0.0.1:8080";
 final API_COVERAGE_URL = API_URL + "/v1/coverage";
 final API_CELLS_URL = API_URL + "/v1/cells";
 

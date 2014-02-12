@@ -77,8 +77,7 @@ JsObject _createLegendControl() {
   
   legendControl['onAdd'] = (map) {
     final colors = ['#00FF00', '#FFFF00', '#FF0000'];
-    final grades = [0, 0.4, 0.8];
-    final labels = ['0&ndash;13', '13&ndash;26', '26&ndash;31'];
+    final labels = ['-60&ndash;-40', '-85&ndash;-60', '-120&ndash;-60'];
         
     var container = new DivElement();
     container.classes.addAll(['info', 'legend']);
@@ -101,6 +100,12 @@ JsObject _createCellsFormControl() {
   cellsFormControl['onAdd'] = (map) {
     Element container = new Element.tag("cellsform");
     container.classes.addAll(['info', 'cells_form']);
+    
+    JsObject domEvent = context['L']['DomEvent'];
+    var stop = context['L']['DomEvent']['stopPropagation'];
+    domEvent.callMethod("on", [container, 'click', stop]);
+    domEvent.callMethod("on", [container, 'mousedown', stop]);
+    
     return container;
   };
   return cellsFormControl;

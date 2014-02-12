@@ -118,16 +118,18 @@ L.TileLayer.MaskCanvas = L.TileLayer.Canvas.extend({
     },
 
 	_getColor: function (intensity) {
-	     if (intensity > 0.8) {
-	         r = 255 - Math.round(50*(intensity-0.8));
+	     if (intensity > -60) {
+	         if (intensity > -30) { intensity = -30; }
+	         r = 255 - Math.round(255*(intensity+60)/30);
 	         g = 0;
 	         b = 0;
-	     }else if (intensity > 0.4) {
+	     }else if (intensity > -85) {
 	         r = 255;
-	         g = 255 - Math.round(255*(intensity-0.4));
+	         g = 255 - Math.round(255*(intensity+85)/25);
 	         b = 0;
 	     }else {
-	         r = 0 + Math.round(255*intensity);
+	         if (intensity < -120) intensity = -120;
+	         r = 0 + Math.round(255*(intensity+120)/35);
 	         g = 255
 	         b = 0;
 	     }

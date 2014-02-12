@@ -26,10 +26,10 @@ class CellInfo extends JsonObject {
   CellInfo();
   
   CellInfo.fromMap(Map json) :
-    mcc = json['mcc'], 
-    mnc = json['mnc'],
-    lac = json['lac'],
-    cid = json['cid'],
+    mcc = json['mcc'] == null ? -1 : json['mcc'], 
+    mnc = json['mnc'] == null ? -1 : json['mnc'],
+    lac = json['lac'] == null ? -1 : json['lac'],
+    cid = json['cid'] == null ? -1 : json['cid'],
     netwok_radio = json['network_radio']
     {
     if (json.containsKey('asu_min')) asu_min = json['asu_min'];
@@ -45,7 +45,7 @@ class CellInfo extends JsonObject {
   String mnc_name() => MNC_NAMES.containsKey(mnc) ? "$mnc ${MNC_NAMES[mnc]}" : mnc.toString();
   
   static List<CellInfo> listFromJsonString(String string) {
-    List items = JSON.decode(string);
+    var items = JSON.decode(string);
     List<CellInfo> res = new List<CellInfo>();
     for (Map item in items) {
       res.add(new CellInfo.fromMap(item));

@@ -19,9 +19,7 @@ class CellInfo extends JsonObject {
   int mnc;
   int lac;
   int cid;
-  String netwok_radio;
-  num asu_min;
-  num asu_max;
+  String network_radio;
   
   CellInfo();
   
@@ -30,10 +28,8 @@ class CellInfo extends JsonObject {
     mnc = json['mnc'] == null ? -1 : json['mnc'],
     lac = json['lac'] == null ? -1 : json['lac'],
     cid = json['cid'] == null ? -1 : json['cid'],
-    netwok_radio = json['network_radio']
+    network_radio = json['radio']
     {
-    if (json.containsKey('asu_min')) asu_min = json['asu_min'];
-    if (json.containsKey('asu_max')) asu_max = json['asu_max'];
   }
   
   factory CellInfo.fromJsonString(string) {

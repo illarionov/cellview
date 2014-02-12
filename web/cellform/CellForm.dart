@@ -27,6 +27,10 @@ class CellForm {
             <select id="select_mnc"></select>
           </li>
         <li>
+            <label for="select_radio">Radio:</label>
+            <select id="select_radio"></select>
+        </li>
+        <li>
             <label for="select_lac">LAC:</label>
             <select id="select_lac"></select>
           </li>
@@ -57,7 +61,7 @@ class CellForm {
   SelectElement selectMccField;
   SelectElement selectLacField;
   SelectElement selectCidField;
-  
+  SelectElement selectRadioField;
   
   CellForm()
       : leafletControl = new JsObject(context['L']['Control'],
@@ -69,11 +73,13 @@ class CellForm {
       selectMccField = container.querySelector('#select_mcc');
       selectLacField = container.querySelector('#select_lac');
       selectCidField = container.querySelector('#select_cid');
+      selectRadioField = container.querySelector('#select_radio');
       
       selectMncField.onChange.listen(_onMncSelectionChanged);
       selectMccField.onChange.listen(_onMccSelectionChanged);
       selectLacField.onChange.listen(_onLacSelectionChanged);
       selectCidField.onChange.listen(_onCidSelectionChanged);
+      selectRadioField.onChange.listen(_onRadioSelectionChanged);
 
       _loadCellsInfo().then((String fileContents){
         refreshFormData();
@@ -95,12 +101,15 @@ class CellForm {
   int getSelectedMcc() =>  _getIntOrNullValue(selectMccField);
   int getSelectedLac() =>  _getIntOrNullValue(selectLacField);
   int getSelectedCid() =>  _getIntOrNullValue(selectCidField);
+  String getSelectedRadio() => selectRadioField.value == null 
+      || selectRadioField.value == "" ? null : selectRadioField.value;
    
   CellFormData get value {
     return new CellFormData(mnc: getSelectedMnc(),
         mcc: getSelectedMcc(),
         lac: getSelectedLac(),
-        cid: getSelectedCid()
+        cid: getSelectedCid(),
+        radio: getSelectedRadio()
         );
   }
   
@@ -111,6 +120,7 @@ class CellForm {
     _refreshMncList();
     _refreshCidList();
     _refreshLacList();
+    _refreshRadioList();
   }
   
   Future _loadCellsInfo() {
@@ -129,6 +139,7 @@ class CellForm {
     selectLacField.disabled = loading;
     selectLacField.disabled = loading;
     selectCidField.disabled = loading;
+    selectRadioField.disabled = loading;
   }
   
   void _refreshMccList() {
@@ -154,61 +165,86 @@ class CellForm {
     Iterable<CellInfo> cellsFiltered;
     List<OptionElement> mncValues = new List<OptionElement>();
     
-    cells.forEach((e) => mncMap[e.mnc] = e);
+    cellsFiltered = _grepCurrentMcc(cells);
+    
+    cellsFiltered.forEach((e) => mncMap[e.mnc] = e);
     cellsSorted = mncMap.values.toList();
     cellsSorted.sort((a,b) => a.mnc.compareTo(b.mnc));
     
-    cellsFiltered = _grepCurrentMcc(cellsSorted);
-   
     mncValues.add(OPTION_ELEMENT_ALL);
-    for (CellInfo item in cellsFiltered) {
+    for (CellInfo item in cellsSorted) {
       mncValues.add(new OptionElement(value: item.mnc.toString(),
           data: item.mnc_name()));
     }
     selectMncField.nodes = mncValues;
   }
   
-  void _refreshCidList() {
-    Map cidMap = new Map();
+  void _refreshRadioList() {
+    Map radioMap = new Map();
     List<CellInfo> cellsSorted;
     Iterable<CellInfo> cellsFiltered;
-    List<OptionElement> cidValues = new List<OptionElement>();
     
-    cells.forEach((e) => cidMap[e.cid] = e);
-    cellsSorted = cidMap.values.toList();
-    cellsSorted.sort((a,b) => a.cid.compareTo(b.cid));
-    cellsFiltered = _grepCurrentMcc(cellsSorted);
+    cellsFiltered = _grepCurrentMcc(cells);
     cellsFiltered = _grepCurrentMnc(cellsFiltered);
-    cellsFiltered = _grepCurrentLac(cellsFiltered);
     
-    cidValues.add(OPTION_ELEMENT_ALL);
-    for (CellInfo item in cellsFiltered) {
-      cidValues.add(new OptionElement(value: item.cid.toString(),
-          data: item.cid.toString()));
+    cellsFiltered.forEach((e) => radioMap[e.network_radio] = e);
+    cellsSorted = radioMap.values.toList();
+    cellsSorted.sort((a,b) => a.network_radio.compareTo(b.network_radio));   
+    
+    List<OptionElement> radioValues = new List<OptionElement>();
+    radioValues.add(OPTION_ELEMENT_ALL);
+    for (CellInfo item in cellsSorted) {
+      radioValues.add(new OptionElement(value: item.network_radio,
+          data: item.network_radio));
     }
-    selectCidField.nodes = cidValues;
+    selectRadioField.nodes = radioValues;
   }
-  
+
   void _refreshLacList() {
-    Map lacMap = new Map();
     List<CellInfo> cellsSorted;
     Iterable<CellInfo> cellsFiltered;
-    List<OptionElement> lacValues = new List<OptionElement>();
     
-    cells.forEach((e) => lacMap[e.lac] = e);
+    cellsFiltered = _grepCurrentMcc(cells);
+    cellsFiltered = _grepCurrentMnc(cellsFiltered);
+    cellsFiltered = _grepCurrentRadio(cellsFiltered);
+    
+    Map lacMap = new Map();
+    cellsFiltered.forEach((e) => lacMap[e.lac] = e);
     cellsSorted = lacMap.values.toList();
     cellsSorted.sort((a,b) => a.lac.compareTo(b.lac));
-    cellsFiltered = _grepCurrentMcc(cellsSorted);
-    cellsFiltered = _grepCurrentMnc(cellsFiltered); 
     
+    List<OptionElement> lacValues = new List<OptionElement>();
     lacValues.add(OPTION_ELEMENT_ALL);
-    for (CellInfo item in cellsFiltered) {
+    for (CellInfo item in cellsSorted) {
       lacValues.add(new OptionElement(value: item.lac.toString(),
           data: item.lac.toString()));
     }
     selectLacField.nodes = lacValues;
   }
-  
+    
+  void _refreshCidList() {
+    List<CellInfo> cellsSorted;
+    
+    Iterable<CellInfo> cellsFiltered;
+    cellsFiltered = _grepCurrentMcc(cells);
+    cellsFiltered = _grepCurrentMnc(cellsFiltered);
+    cellsFiltered = _grepCurrentRadio(cellsFiltered);
+    cellsFiltered = _grepCurrentLac(cellsFiltered);
+    
+    Map cidMap = new Map();
+    cellsFiltered.forEach((e) => cidMap[e.cid] = e);
+    cellsSorted = cidMap.values.toList();
+    cellsSorted.sort((a,b) => a.cid.compareTo(b.cid));
+    
+    List<OptionElement> cidValues = new List<OptionElement>();
+    cidValues.add(OPTION_ELEMENT_ALL);
+    for (CellInfo item in cellsSorted) {
+      cidValues.add(new OptionElement(value: item.cid.toString(),
+          data: item.cid.toString()));
+    }
+    selectCidField.nodes = cidValues;
+  }
+      
   Iterable<CellInfo> _grepCurrentMcc(Iterable<CellInfo> iterable) {
     int selectedMcc = getSelectedMcc();
     return selectedMcc == null ? 
@@ -227,23 +263,37 @@ class CellForm {
         iterable : iterable.where((ci) => ci.lac == selectedLac);
   }
   
+  Iterable<CellInfo> _grepCurrentRadio(Iterable<CellInfo> iterable) {
+    String selectedRadio = getSelectedRadio();
+    return selectedRadio == null ? 
+        iterable : iterable.where((ci) => ci.network_radio == selectedRadio);
+  }
+  
   void notifyFormSelectionChanged() {
     _notificator.add(value);
   }
   
   void _onMccSelectionChanged(Event e) {
     _refreshMncList();
+    _refreshRadioList();
     _refreshLacList();
     _refreshCidList();
     notifyFormSelectionChanged();
   }
   
   void _onMncSelectionChanged(Event e) {
+    _refreshRadioList();
     _refreshLacList();
     _refreshCidList();
     notifyFormSelectionChanged();
   }
 
+  void _onRadioSelectionChanged(Event e) {
+    _refreshLacList();
+    _refreshCidList();
+    notifyFormSelectionChanged();
+  }
+  
   void _onLacSelectionChanged(Event e) {
     _refreshCidList();
     notifyFormSelectionChanged();
@@ -252,5 +302,5 @@ class CellForm {
   void _onCidSelectionChanged(Event e) {
     notifyFormSelectionChanged();
   }
-
+  
 }
